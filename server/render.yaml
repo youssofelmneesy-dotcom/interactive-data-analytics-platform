@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: data-analytics-platform-api
+    runtime: docker
+    plan: standard
+    branch: main
+    healthCheckPath: /api/
+    envVars:
+      - key: APP_NAME
+        value: Data Analytics Platform
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: DEBUG
+        value: "false"
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 8000
+      - key: CORS_ORIGINS
+        sync: false
+      - key: DATABASE_URL
+        value: sqlite:///./data_analytics.db
+      - key: GEMINI_API_KEY
+        sync: false
+    disk:
+      name: data-storage
+      mountPath: /app/uploads
+      sizeGB: 1
+      
