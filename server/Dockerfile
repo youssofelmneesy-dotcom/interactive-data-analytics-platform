@@ -34,7 +34,7 @@ RUN playwright install chromium
 
 # Copy application code
 COPY app/ ./app/
-COPY data_analytics.db ./data_analytics.db 2>/dev/null || true
+
 
 # Create uploads and reports directories
 RUN mkdir -p uploads reports
