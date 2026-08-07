@@ -1,14 +1,16 @@
 """
 FastAPI application entry point.
 """
+
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pathlib import Path
 
+from app.api.router import router
 from app.core.config import settings
 from app.db.models import init_db
-from app.api.router import router
 
 
 def create_app() -> FastAPI:
@@ -18,15 +20,19 @@ def create_app() -> FastAPI:
     Returns:
         Configured FastAPI application with middleware and routers.
     """
+
     app = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
         debug=settings.debug,
-        docs_url="/docs" if settings.debug else None,
-        redoc_url="/redoc" if settings.debug else None,
+
+        # ✅ Always enable Swagger
+        docs_url="/docs",
+        redoc_url="/redoc",
+        openapi_url="/openapi.json",
     )
 
-    # CORS middleware
+    # CORS
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
@@ -35,23 +41,27 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Include API routers
+    # API Routes
     app.include_router(router)
 
-    # Serve static files for reports
+    # Static reports
     reports_dir = Path("reports")
     reports_dir.mkdir(parents=True, exist_ok=True)
-    app.mount("/reports", StaticFiles(directory=str(reports_dir)), name="reports")
 
-    # Initialize database on startup
+    app.mount(
+        "/reports",
+        StaticFiles(directory=str(reports_dir)),
+        name="reports",
+    )
+
     @app.on_event("startup")
     def startup_event() -> None:
-        """Initialize the SQLite database when the application starts."""
+        """Initialize database."""
         init_db()
 
     return app
 
 
-# Application instance for ASGI servers (uvicorn)
+# ASGI application
 app = create_app()
 
