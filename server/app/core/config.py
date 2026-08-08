@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     port: int = Field(default=8000, alias="PORT")
 
     cors_origins: str = Field(
-        default="http://localhost:5173,http://localhost:3000",
+        default="http://localhost:5173,http://localhost:3000,https://interactive-data-analytics-platform.vercel.app",
         alias="CORS_ORIGINS",
     )
 
